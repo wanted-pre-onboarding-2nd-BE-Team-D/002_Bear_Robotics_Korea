@@ -71,14 +71,12 @@ class SubsidaryDetail(APIView):
         try:
             subsidary = Subsidary.objects.get(id=id)
             if subsidary.is_delete == True:
-                subsidary.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
+                raise Subsidary.DoesNotExist
             serializer = SubsidarySerializer(subsidary)
             subsidary.is_delete = True
             subsidary.delete_at = datetime.now()
             subsidary.save()
             return Response(serializer, status=200)
-
         except Subsidary.DoesNotExist:
             return Response(status=404)
 
