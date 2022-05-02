@@ -3,6 +3,7 @@ from logging          import exception
 from urllib           import request
 from django.http      import Http404
 from django.shortcuts import render
+from datetime         import datetime,timedelta
 
 from rest_framework          import status
 from rest_framework.response import Response
@@ -15,15 +16,14 @@ from restaurants  import serializers
 
 # 업종정보 API CRUD
 
-
+# Subsidary API
 class SubsidaryList(APIView):
     """
     류성훈
     """
-
     def get(self, request, format=None):
-        # Subsidary의 모든 데이터를 읽어온다.
-        subsidary = Subsidary.objects.all()
+        # Subsidary의 모든 유효한 데이터를 읽어온다. 
+        subsidary = Subsidary.objects.filter(is_delete=False)
         serializer = SubsidarySerializer(subsidary, many=True)
         return Response(serializer.data)
 
@@ -40,7 +40,6 @@ class SubsidaryDetail(APIView):
     """
     류성훈
     """
-
     def get_object(self, id):
         # 받아올 데이터의 유효성을 검사합니다.
         try:
@@ -61,10 +60,27 @@ class SubsidaryDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    # Soft Delete 방식 채택으로 인한 Delete기능 주석처리
+    # def delete(self, request, id, format=None):
+    #     subsidary = self.get_object(id)
+    #     subsidary.delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # 한번 삭제 시 Soft Delete / Soft Delete 된 데이터 또 삭제 시 영구 Delete
     def delete(self, request, id, format=None):
-        subsidary = self.get_object(id)
-        subsidary.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            subsidary = Subsidary.objects.get(id=id)
+            if subsidary.is_delete == True:
+                subsidary.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            serializer = SubsidarySerializer(subsidary)
+            subsidary.is_delete = True
+            subsidary.delete_at = datetime.now()
+            subsidary.save()
+            return Response(serializer, status=200)
+
+        except Subsidary.DoesNotExist:
+            return Response(status=404)
 
 #레스토랑 API
 class RestaurantAPI(APIView):
