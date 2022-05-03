@@ -1,8 +1,4 @@
-from itertools        import count
-from logging          import exception
-from urllib           import request
 from django.http      import Http404
-from django.shortcuts import render
 from datetime         import datetime,timedelta
 
 from rest_framework          import status
@@ -10,8 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views    import APIView
 
 from .models      import Restaurant, Subsidary, Menu, Ward, Neighborhood
-from .serializers import SubsidarySerializer, RestaurantSerializer
-from restaurants  import serializers
+from .serializers import SubsidarySerializer, RestaurantSerializer, MenuSerializer
 
 
 # 업종정보 API CRUD
@@ -22,14 +17,14 @@ class SubsidaryList(APIView):
     류성훈
     """
     def get(self, request, format = None):
-        # Subsidary의 모든 유효한 데이터를 읽어온다. 
+        # Subsidary의 모든 유효한 데이터를 읽어온다.
         subsidary  = Subsidary.objects.filter(is_delete = False)
         serializer = SubsidarySerializer(subsidary, many = True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
         # Subsidary에 새로운 데이터를 추가합니다.
-        serializer = SubsidarySerializer(darta = request.data)
+        serializer = SubsidarySerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status = 200)
@@ -95,7 +90,7 @@ class RestaurantAPI(APIView):
         return ward_obj, subsidary_obj
 
     # Restaurant 조회
-    def get(self, request,id = None):        
+    def get(self, request,id = None):
         many = True
         # id 쿼리를 받으면 부분 조회
         if id:
@@ -115,10 +110,10 @@ class RestaurantAPI(APIView):
         try:
             if Restaurant.objects.get(ward_id = ward_obj.id, subsidary_id = subsidary_obj.id, is_delete = False):
                 return Response({'MESSAGE': 'DUPLICATE_VALUE'}, status = 400)
-        except:                    
+        except:
             create_obj       = Restaurant.objects.create(
                 ward_id      = ward_obj.id,
-                subsidary_id = subsidary_obj.id,                
+                subsidary_id = subsidary_obj.id,
             )
         #create_obj.save()
         serializers = RestaurantSerializer(create_obj)
@@ -169,3 +164,64 @@ class RestaurantAPI(APIView):
             raise ValueError("MISSING_VALUE")
         serializers = RestaurantSerializer(obj)
         return Response(serializers.data)
+
+
+class MenuListView(APIView):
+    """
+        정미정
+    """
+    def get_subsidary(self, request):
+        subsidary = request.data['subsidary']
+        subsidary_obj = Subsidary.objects.get(id=subsidary)
+        return subsidary_obj
+
+    def get(self, request):
+        menus = Menu.objects.filter(is_delete=False)
+        serializer = MenuSerializer(menus, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        subsidary = self.get_subsidary(request)
+        serializer = MenuSerializer(subsidary, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MenuDetailView(APIView):
+    """
+        정미정
+    """
+
+    def get_object(self, id):
+        try:
+            return Menu.objects.get(id=id)
+        except Menu.DoesNotExist:
+            # raise가 나을지, response를 하는 게 나을지 고민
+            return Response({'MESSAGE': 'MENU_DOES_NOT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request, id):
+        menu = self.get_object(id)
+        serializer = MenuSerializer(menu)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request, id):
+        menu = self.get_object(id)
+        serializer = MenuSerializer(menu, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, id):
+        menu = self.get_object(id)
+
+        if menu.is_delete:
+            # return response가 맞을까?
+            raise menu.DoesNotExist
+
+        menu.is_delete = True
+        menu.delete_at = datetime.now()
+        menu.save()
+        return Response(status=status.HTTP_200_OK)
