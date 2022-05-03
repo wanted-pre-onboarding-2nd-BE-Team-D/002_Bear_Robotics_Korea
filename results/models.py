@@ -21,6 +21,7 @@ class Result(TimeStampModel):
 class ResultMenu(TimeStampModel):
     result = models.ForeignKey('Result', on_delete=models.PROTECT)
     menu = models.ForeignKey('restaurants.Menu', on_delete=models.PROTECT)
+    quantity = models.PositiveIntegerField()
     discount_rate = models.DecimalField(
         max_digits=4, decimal_places=3, default=1,
         null=True, blank=True
