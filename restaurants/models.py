@@ -6,6 +6,8 @@ from core.models import TimeStampModel
 class Restaurant(TimeStampModel):
     subsidary = models.ForeignKey('Subsidary', on_delete=models.PROTECT)
     ward = models.ForeignKey('Ward', on_delete=models.PROTECT)
+    name = models.CharField(max_length=100)
+    store = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
         db_table = 'restaurants'
