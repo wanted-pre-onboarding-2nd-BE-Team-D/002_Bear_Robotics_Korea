@@ -1,6 +1,6 @@
 from rest_framework import serializers
-
-from restaurants.models import Restaurant, Subsidary, Menu, Ward, Neighborhood
+from restaurants.models import Restaurant, Subsidary, Menu, \
+    Ward, Neighborhood
 
 
 class RestaurantSerializer(serializers.ModelSerializer):
@@ -16,9 +16,12 @@ class SubsidarySerializer(serializers.ModelSerializer):
 
 
 class MenuSerializer(serializers.ModelSerializer):
+    """
+        정미정
+    """
     class Meta:
         model = Menu
-        fields = "__all__"
+        fields = ('id', 'subsidary', 'name', 'price')
 
 
 class WardSerializer(serializers.ModelSerializer):

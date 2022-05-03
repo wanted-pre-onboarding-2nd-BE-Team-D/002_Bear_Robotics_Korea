@@ -184,7 +184,7 @@ class MenuListView(APIView):
     """
     def get_subsidary(self, request):
         subsidary = request.data['subsidary']
-        subsidary_obj = Subsidary.objects.get(name=subsidary)
+        subsidary_obj = Subsidary.objects.get(id=subsidary)
         return subsidary_obj
 
     def get(self, request):
