@@ -14,7 +14,7 @@ from .serializers import SubsidarySerializer, RestaurantSerializer, MenuSerializ
 # Subsidary API
 class SubsidaryList(APIView):
     """
-    류성훈
+        류성훈
     """
     def get(self, request, format = None):
         # Subsidary의 모든 유효한 데이터를 읽어온다.
@@ -33,7 +33,7 @@ class SubsidaryList(APIView):
 
 class SubsidaryDetail(APIView):
     """
-    류성훈
+        류성훈
     """
     def get_object(self, id):
         # 받아올 데이터의 유효성을 검사합니다.
