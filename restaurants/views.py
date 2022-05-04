@@ -93,7 +93,7 @@ class RestaurantListCR(APIView):
     
     def get(self, request,id = None):
         # 레스토랑 조회, search 쿼리가 들어오면 주소나, 이름중에 찾는다
-        if request.GET['search']:
+        if 'search' in request.GET:
             obj     = Restaurant.objects.filter(name__icontains=request.GET['search'],
                                                     is_delete=False)
         else:
