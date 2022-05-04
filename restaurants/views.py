@@ -1,12 +1,12 @@
-from django.http    import Http404
-from datetime       import datetime, timedelta
+from django.http      import Http404
+from datetime         import datetime,timedelta
 
-from rest_framework             import status
-from rest_framework.response    import Response
-from rest_framework.views       import APIView
+from rest_framework          import status
+from rest_framework.response import Response
+from rest_framework.views    import APIView
 
-from .models        import Restaurant, Subsidary, Menu, Ward, Neighborhood
-from .serializers   import SubsidarySerializer, RestaurantSerializer, MenuSerializer
+from .models      import Restaurant, Subsidary, Menu, Ward, Neighborhood
+from .serializers import SubsidarySerializer, RestaurantSerializer, MenuSerializer
 
 
 # 업종정보 API CRUD
@@ -16,10 +16,9 @@ class SubsidaryList(APIView):
     """
         류성훈
     """
-
     def get(self, request, format = None):
         # Subsidary의 모든 유효한 데이터를 읽어온다.
-        subsidary = Subsidary.objects.filter(is_delete = False)
+        subsidary  = Subsidary.objects.filter(is_delete = False)
         serializer = SubsidarySerializer(subsidary, many = True)
         return Response(serializer.data)
 
@@ -76,8 +75,7 @@ class SubsidaryDetail(APIView):
         except Subsidary.DoesNotExist:
             return Response(status = 404)
 
-
-# 레스토랑 API
+#레스토랑 API
 class RestaurantAPI(APIView):
     """
     김석재
@@ -85,14 +83,14 @@ class RestaurantAPI(APIView):
 
     # 주소, 업종을 id로 변환
     def chang_to_id(self, request):
-        ward            = request.data['ward']
-        subsidary       = request.data['subsidary']
-        ward_obj        = Ward.objects.get(name=ward)
-        subsidary_obj   = Subsidary.objects.get(name=subsidary)
+        ward          = request.data['ward']
+        subsidary     = request.data['subsidary']
+        ward_obj      = Ward.objects.get(name=ward)
+        subsidary_obj = Subsidary.objects.get(name=subsidary)
         return ward_obj, subsidary_obj
 
     # Restaurant 조회
-    def get(self, request, id = None):
+    def get(self, request,id = None):
         many = True
         # id 쿼리를 받으면 부분 조회
         if id:
@@ -100,10 +98,10 @@ class RestaurantAPI(APIView):
             many = False
         else:
             obj     = Restaurant.objects.filter(is_delete=False)
-        serializers = RestaurantSerializer(obj, many=many)
+        serializers = RestaurantSerializer(obj, many = many)
         return Response(serializers.data)
 
-    def post(self, request, id=None):
+    def post(self, request,id = None):
         # 주소, 업종을 id로 변환
         ward_obj, subsidary_obj = self.chang_to_id(request)
         print(ward_obj.id, subsidary_obj.id)
@@ -121,7 +119,7 @@ class RestaurantAPI(APIView):
         serializers = RestaurantSerializer(create_obj)
         return Response(serializers.data)
 
-    def put(self, request, id = None):
+    def put(self, request,id = None):
         if id:
             if len(request.data.values()) == 0:
                 raise ValueError("MISSING_VALUE")
@@ -150,10 +148,10 @@ class RestaurantAPI(APIView):
         serializers = RestaurantSerializer(obj)
         return Response(serializers.data)
 
-    def delete(self, request, id=None):
+    def delete(self, request,id = None):
 
         if id:
-            obj = Restaurant.objects.get(id=id)
+            obj = Restaurant.objects.get(id = id)
             # 이미 삭제 되었다면 에러
             if obj.is_delete == True:
                 raise ValueError("DOES_NOT_EXIST")
