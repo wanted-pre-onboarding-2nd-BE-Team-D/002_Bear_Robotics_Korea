@@ -166,14 +166,16 @@ class RestaurantAPI(APIView):
         return Response(serializers.data)
 
 
-class MenuListView(APIView):
+class MenuCreateListView(APIView):
     """
         정미정
+
+        {
+         "subsidary": 1 // subsidary_id
+         "name": "menu1",
+         "price": 10000
+         }
     """
-    def get_subsidary(self, request):
-        subsidary = request.data['subsidary']
-        subsidary_obj = Subsidary.objects.get(id=subsidary)
-        return subsidary_obj
 
     def get(self, request):
         menus = Menu.objects.filter(is_delete=False)
@@ -181,9 +183,8 @@ class MenuListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-        subsidary = self.get_subsidary(request)
-        serializer = MenuSerializer(subsidary, data=request.data)
-        if serializer.is_valid():
+        serializer = MenuSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -198,17 +199,22 @@ class MenuDetailView(APIView):
         try:
             return Menu.objects.get(id=id)
         except Menu.DoesNotExist:
-            # raise가 나을지, response를 하는 게 나을지 고민
-            return Response({'MESSAGE': 'MENU_DOES_NOT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
     def get(self, request, id):
         menu = self.get_object(id)
+        if menu.status_code == 404:
+            return Response({'MESSAGE': 'MENU_DOES_NOT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
+
         serializer = MenuSerializer(menu)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, id):
         menu = self.get_object(id)
-        serializer = MenuSerializer(menu, data=request.data)
+        if menu.status_code == 404:
+            return Response({'MESSAGE': 'MENU_DOES_NOT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = MenuSerializer(menu, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -217,11 +223,10 @@ class MenuDetailView(APIView):
     def delete(self, request, id):
         menu = self.get_object(id)
 
-        if menu.is_delete:
-            # return response가 맞을까?
-            raise menu.DoesNotExist
+        if menu.status_code == 404 or menu.is_delete:
+            return Response({'MESSAGE': 'MENU_DOES_NOT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
 
         menu.is_delete = True
         menu.delete_at = datetime.now()
         menu.save()
-        return Response(status=status.HTTP_200_OK)
+        return Response({'MESSAGE': 'SUCCESS'}, status=status.HTTP_200_OK)
