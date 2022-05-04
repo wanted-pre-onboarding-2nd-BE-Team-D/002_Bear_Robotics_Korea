@@ -14,7 +14,7 @@ from .serializers import SubsidarySerializer, RestaurantSerializer, MenuSerializ
 # Subsidary API
 class SubsidaryList(APIView):
     """
-    류성훈
+        류성훈
     """
 
     def get(self, request, format=None):
@@ -34,7 +34,7 @@ class SubsidaryList(APIView):
 
 class SubsidaryDetail(APIView):
     """
-    류성훈
+        류성훈
     """
 
     def get_object(self, id):
