@@ -75,57 +75,80 @@ class SubsidaryDetail(APIView):
         except Subsidary.DoesNotExist:
             return Response(status = 404)
 
-#레스토랑 API
-class RestaurantAPI(APIView):
+
+class RestaurantListCR(APIView):    
     """
+    Restaurant List CR API
+    
     김석재
     """
-
-    # 주소, 업종을 id로 변환
-    def chang_to_id(self, request):
+    
+    def _change_to_id(self, request):
+        # 주소, 업종을 id로 변환
         ward          = request.data['ward']
-        subsidary     = request.data['subsidary']
+        subsidary     = request.data['subsidary']        
         ward_obj      = Ward.objects.get(name=ward)
-        subsidary_obj = Subsidary.objects.get(name=subsidary)
-        return ward_obj, subsidary_obj
-
-    # Restaurant 조회
+        subsidary_obj = Subsidary.objects.get(name=subsidary)        
+        return ward_obj, subsidary_obj ,ward ,subsidary
+    
     def get(self, request,id = None):
-        many = True
-        # id 쿼리를 받으면 부분 조회
-        if id:
-            obj  = Restaurant.objects.get(is_delete=False, id=id)
-            many = False
+        # 레스토랑 조회, search 쿼리가 들어오면 주소나, 이름중에 찾는다
+        if request.GET['search']:
+            obj     = Restaurant.objects.filter(name__icontains=request.GET['search'],
+                                                    is_delete=False)
         else:
             obj     = Restaurant.objects.filter(is_delete=False)
-        serializers = RestaurantSerializer(obj, many = many)
+        serializers = RestaurantSerializer(obj, many = False)
         return Response(serializers.data)
 
     def post(self, request,id = None):
         # 주소, 업종을 id로 변환
-        ward_obj, subsidary_obj = self.chang_to_id(request)
-        print(ward_obj.id, subsidary_obj.id)
-
-        # 주소와 업종 동시에 똑같은 값이 있을 경우 & 삭제되지않았을때
+        ward_obj, subsidary_obj ,ward ,subsidary= self._change_to_id(request)
+        store=request.data['store']
+        
+        # 주소와 업종, 호점 동시에 똑같은 값이 있을 경우 & 삭제되지않았을때
         try:
-            if Restaurant.objects.get(ward_id = ward_obj.id, subsidary_id = subsidary_obj.id, is_delete = False):
+            if Restaurant.objects.get(ward_id = ward_obj.id, subsidary_id = subsidary_obj.id,
+                                      store=store ,is_delete = False):
                 return Response({'MESSAGE': 'DUPLICATE_VALUE'}, status = 400)
         except:
             create_obj       = Restaurant.objects.create(
                 ward_id      = ward_obj.id,
                 subsidary_id = subsidary_obj.id,
+                store        = store,
+                name         = f"{subsidary}, {ward}점"
             )
-        #create_obj.save()
+        
         serializers = RestaurantSerializer(create_obj)
+        return Response(serializers.data)    
+    
+class RestaurantListUD(APIView):    
+    """
+    Restaurant List UD API
+    
+    김석재
+    """
+    def _change_to_id(self, request):
+        # 주소, 업종을 id로 변환
+        ward          = request.data['ward']
+        subsidary     = request.data['subsidary']        
+        ward_obj      = Ward.objects.get(name=ward)
+        subsidary_obj = Subsidary.objects.get(name=subsidary)        
+        return ward_obj, subsidary_obj
+    
+    def get(self, request,id = None):
+        # Restaurant 디테일 조회        
+        obj  = Restaurant.objects.get(is_delete=False, id=id)      
+        serializers = RestaurantSerializer(obj, many = True)
         return Response(serializers.data)
-
+    
     def put(self, request,id = None):
         if id:
             if len(request.data.values()) == 0:
                 raise ValueError("MISSING_VALUE")
 
-            ward_obj, subsidary_obj = self.chang_to_id(request)
-            obj = Restaurant.objects.get(id = id)
+            ward_obj, subsidary_obj ,ward ,subsidary = self._change_to_id(request)
+            obj = Restaurant.objects.get(id = id)            
 
             # 삭제된 값이라면 에러
             if obj.is_delete == True:
@@ -136,12 +159,16 @@ class RestaurantAPI(APIView):
                 obj.ward_id      = ward_obj.id
             if 'subsidary' in request.data:
                 obj.subsidary_id = subsidary_obj.id
+            if 'store' in request.data:
+                obj.store        = request.data['store']
 
             # 주소와 업종 동시에 똑같은 값이 있을 경우
             try:
-                if Restaurant.objects.get(ward_id = obj.ward_id, subsidary_id = obj.subsidary_id, is_delete = False):
+                if Restaurant.objects.get(ward_id = obj.ward_id, subsidary_id = obj.subsidary_id,
+                                          store = obj.store, is_delete = False):
                     return Response({'MESSAGE': 'DUPLICATE_VALUE'}, status = 400)
             except:
+                obj.name = f"{subsidary}, {ward}점"
                 obj.save()
         else:
             raise ValueError("MISSING_VALUE")
@@ -149,9 +176,9 @@ class RestaurantAPI(APIView):
         return Response(serializers.data)
 
     def delete(self, request,id = None):
-
         if id:
             obj = Restaurant.objects.get(id = id)
+            
             # 이미 삭제 되었다면 에러
             if obj.is_delete == True:
                 raise ValueError("DOES_NOT_EXIST")
@@ -162,9 +189,10 @@ class RestaurantAPI(APIView):
         else:
             # ID입력을 안하면 에러
             raise ValueError("MISSING_VALUE")
+        
         serializers = RestaurantSerializer(obj)
         return Response(serializers.data)
-
+    
 
 class MenuListView(APIView):
     """
