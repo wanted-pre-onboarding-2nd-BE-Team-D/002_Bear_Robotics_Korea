@@ -7,7 +7,7 @@ urlpatterns = [
     path('subsidary/<int:id>', views.SubsidaryDetail.as_view()),
 
     path('', views.RestaurantListCR.as_view()),
-    path('<id>', views.RestaurantListUD.as_view()),
+    path('<int:id>', views.RestaurantListUD.as_view()),
 
     path('subsidary/menu', views.MenuCreateListView.as_view()),
     path('subsidary/menu/<int:id>', views.MenuDetailView.as_view())
