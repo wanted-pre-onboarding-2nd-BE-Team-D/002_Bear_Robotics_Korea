@@ -6,7 +6,7 @@ from restaurants.models import Restaurant, Subsidary, Menu, \
 class RestaurantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Restaurant
-        fields = ('id', 'created_at', 'updated_at', 'delete_at', 'subsidary', 'ward', 'name', 'store')
+        fields = ('id', 'created_at', 'updated_at', 'delete_at', 'subsidary_id', 'ward_id', 'name', 'store')
 
 
 class SubsidarySerializer(serializers.ModelSerializer):
