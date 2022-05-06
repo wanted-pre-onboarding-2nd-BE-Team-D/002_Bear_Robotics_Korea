@@ -148,36 +148,38 @@ class RestaurantListCR(APIView):
             )
         
         serializers = RestaurantSerializer(create_obj)
-        return Response(serializers.data)    
-    
-class RestaurantListUD(APIView):    
+        return Response(serializers.data)
+
+
+class RestaurantListUD(APIView):
     """
     Restaurant List UD API
-    
+
     김석재
     """
+
     def _change_to_id(self, request):
         # 주소, 업종을 id로 변환
-        values={}
-        values['ward']          = request.data['ward']
-        values['subsidary']     = request.data['subsidary']        
-        values['ward_obj']      = Ward.objects.get(name=values['ward'])
-        values['subsidary_obj'] = Subsidary.objects.get(name=values['subsidary'])        
+        values = {}
+        values['ward'] = request.data['ward']
+        values['subsidary'] = request.data['subsidary']
+        values['ward_obj'] = Ward.objects.get(name=values['ward'])
+        values['subsidary_obj'] = Subsidary.objects.get(name=values['subsidary'])
         return values
-    
-    def get(self, request,id = None):
-        """ 
-        GET: restaurant/<id>
-        디테일 조회 
+
+    def get(self, request, id=None):
         """
-        try:  
-            obj  = Restaurant.objects.get(is_delete=False, id=id)   
+        GET: restaurant/<id>
+        디테일 조회
+        """
+        try:
+            obj = Restaurant.objects.get(is_delete=False, id=id)
         except:
-            return Response({'MESSAGE' : 'DOES_NOT_EXIST'}, status = 404)
-        serializers = RestaurantSerializer(obj, many = False)
+            return Response({'MESSAGE': 'DOES_NOT_EXIST'}, status=404)
+        serializers = RestaurantSerializer(obj, many=False)
         return Response(serializers.data)
-    
-    def put(self, request,id = None):
+
+    def put(self, request, id=None):
         """
         PUT: restaurant/<id>
         data:{
@@ -186,59 +188,59 @@ class RestaurantListUD(APIView):
                 "store"     : 1
             }
         값을 입력받아 수정
-        """        
-        
-        if id:      
+        """
+
+        if id:
             if len(request.data.values()) == 0 or "" in request.data.values():
-                return Response({'MESSAGE' : 'MISSING_VALUE'}, status = 400)
-            
-            obj = Restaurant.objects.get(id = id)            
+                return Response({'MESSAGE': 'MISSING_VALUE'}, status=400)
+
+            obj = Restaurant.objects.get(id=id)
 
             # 삭제된 값이라면 에러
             if obj.is_delete == True:
-                Response({'MESSAGE' : 'DOES_NOT_EXIST'}, status = 404)
+                Response({'MESSAGE': 'DOES_NOT_EXIST'}, status=404)
 
             # 입력된 값을 변경
-            if 'ward'      in request.data:
-                ward_obj         = Ward.objects.get(name=request.data['ward'])
-                obj.ward_id      = ward_obj.id
+            if 'ward' in request.data:
+                ward_obj = Ward.objects.get(name=request.data['ward'])
+                obj.ward_id = ward_obj.id
             if 'subsidary' in request.data:
-                subsidary_obj    = Subsidary.objects.get(name=request.data['subsidary'])
+                subsidary_obj = Subsidary.objects.get(name=request.data['subsidary'])
                 obj.subsidary_id = subsidary_obj.id
-            if 'store'     in request.data:
-                obj.store        = request.data['store']
+            if 'store' in request.data:
+                obj.store = request.data['store']
 
             # 주소와 업종 동시에 똑같은 값이 있을 경우
             try:
-                if Restaurant.objects.get(ward_id = obj.ward_id, subsidary_id = obj.subsidary_id,
-                                          store   = obj.store,   is_delete    = False):
-                    return Response({'MESSAGE': 'DUPLICATE_VALUE'}, status = 400)
+                if Restaurant.objects.get(ward_id=obj.ward_id, subsidary_id=obj.subsidary_id,
+                                          store=obj.store, is_delete=False):
+                    return Response({'MESSAGE': 'DUPLICATE_VALUE'}, status=400)
             except:
-                ward      = Ward.objects.get(id=obj.ward_id).name
+                ward = Ward.objects.get(id=obj.ward_id).name
                 subsidary = Subsidary.objects.get(id=obj.subsidary_id).name
-                obj.name  = f"{subsidary}, {ward}점"
+                obj.name = f"{subsidary}, {ward}점"
                 obj.save()
         else:
-            Response({'MESSAGE' : 'MISSING_VALUE'}, status = 400)
+            Response({'MESSAGE': 'MISSING_VALUE'}, status=400)
         serializers = RestaurantSerializer(obj)
-        
+
         return Response(serializers.data)
 
-    def delete(self, request,id = None):
+    def delete(self, request, id=None):
         if id:
-            obj = Restaurant.objects.get(id = id)
-            
+            obj = Restaurant.objects.get(id=id)
+
             # 이미 삭제 되었다면 에러
             if obj.is_delete == True:
-                Response({'MESSAGE' : 'DOES_NOT_EXIST'}, status = 404)
+                Response({'MESSAGE': 'DOES_NOT_EXIST'}, status=404)
             else:
                 obj.is_delete = True
                 obj.delete_at = timezone.localtime()
             obj.save()
         else:
             # ID입력을 안하면 에러
-            Response({'MESSAGE' : 'MISSING_VALUE'}, status = 400)
-        
+            Response({'MESSAGE': 'MISSING_VALUE'}, status=400)
+
         serializers = RestaurantSerializer(obj)
         return Response(serializers.data)
     
@@ -260,6 +262,11 @@ class MenuCreateListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
+        subsidary = request.data['subsidary']
+        name = request.data['name']
+        if Menu.objects.get(subsidary_id=subsidary, name=name, is_delete=False):
+            return Response({'MESSAGE': 'DUPLICATE_VALUE'}, status=400)
+
         serializer = MenuSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -280,7 +287,7 @@ class MenuDetailView(APIView):
 
     def get(self, request, id):
         menu = self.get_object(id)
-        if menu.status_code == 404:
+        if menu == 404:
             return Response({'MESSAGE': 'MENU_DOES_NOT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = MenuSerializer(menu)
@@ -288,11 +295,11 @@ class MenuDetailView(APIView):
 
     def patch(self, request, id):
         menu = self.get_object(id)
-        if menu.status_code == 404:
+        if menu == 404:
             return Response({'MESSAGE': 'MENU_DOES_NOT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = MenuSerializer(menu, data=request.data, partial=True)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -300,7 +307,7 @@ class MenuDetailView(APIView):
     def delete(self, request, id):
         menu = self.get_object(id)
 
-        if menu.status_code == 404 or menu.is_delete:
+        if menu == 404 or menu.is_delete:
             return Response({'MESSAGE': 'MENU_DOES_NOT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
 
         menu.is_delete = True
