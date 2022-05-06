@@ -4,10 +4,12 @@ from core.models import TimeStampModel
 
 
 class Result(TimeStampModel):
-    restuarants = models.ManyToManyField(
+    restaurant = models.ForeignKey('restaurants.Restaurant', on_delete=models.PROTECT)
+    subsidary = models.ForeignKey('restaurants.Subsidary', on_delete=models.PROTECT)
+    menus = models.ManyToManyField(
         'restaurants.Menu', through='ResultMenu', related_name='results'
     )
-    payment = models.ForeignKey('Payment', on_delete=models.PROTECT)
+    payment = models.CharField(max_length=10)
     numbers_of_party = models.PositiveIntegerField(default=0, null=True, blank=True)
     total_payments = models.DecimalField(
         max_digits=12, decimal_places=2, default=0,
@@ -29,10 +31,3 @@ class ResultMenu(TimeStampModel):
 
     class Meta:
         db_table = 'result_menus'
-
-
-class Payment(models.Model):
-    name = models.CharField(max_length=10)
-
-    class Meta:
-        db_table = 'payments'
