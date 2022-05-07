@@ -13,42 +13,108 @@
 </div>
 
 ## 목차
+- [D팀 멤버 소개](#-team-d-member)  
+- [개발 기간](#--개발-기간--)  
+- [프로젝트 설명 분석](#-프로젝트-설명--분석)
+- [프로젝트 개발 조건](#-개발-조건)  
+- [프로젝트 요구 조건](#-요구-조건)  
+- [ERD](#erd)  
+- [구현 기능](#구현-기능)  
+- [API 명세서](#api-명세서)  
+- [Test cases code](#테스트-케이스)  
+- [기술 스택](#사용된-기술-스택)  
+
 
 <div align="center">  
-  <h2> 👨‍👨‍👦‍👦 Team "D" member  </h2>
+
+## 👨‍👨‍👦‍👦 Team "D" member  
   
   |권상현|김석재|류성훈|정미정|  
   |:------:|:------:|:------:|:------:|  
   |<img src="https://avatars.githubusercontent.com/u/39396492?v=4" width="200"/> | <img src="https://avatars.githubusercontent.com/u/86823305?v=4" width="200"/> | <img src="https://avatars.githubusercontent.com/u/72593394?v=4" width="200"/> |<img src="https://avatars.githubusercontent.com/u/86827063?v=4" width="200"/> |      
   |[Github](https://github.com/gshduet)|[Github](https://github.com/Cloudblack)|[Github](https://github.com/rsh1994)|[Github](https://github.com/nxxxtyetdecided)|  
-  |뭘 넣을지 미정|ㅇㅇ|ㅇㅇ|ㅇㅇ|  
+  
   <br>
+
+
   
+|<img height="200" width="380" src="https://retaintechnologies.com/wp-content/uploads/2020/04/Project-Management-Mantenimiento-1.jpg">|<img height="200" width="330" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGElLjafMUhHglmqwh9lRh_sVzOCQyBiPNfQ&usqp=CAU">|
+|:------:|:------:|
+|💻 [**Team work**](https://mature-citron-a04.notion.site/Wanted_Pre_Onboarding-6af013e2bb3b43739cebc641de4ff558)  | 📒 [**Project page**](https://mature-citron-a04.notion.site/2-b8c6440fee49445ca63ce4d73d8b19e7)|
+|공지사항, 컨벤션 공유 등<br> 우리 팀을 위한 룰 |요구사항 분석, 정보 공유 및<br> 원할한 프로젝트를 위해 사용|
+
   </div> 
-  <h2> 💻 개발 기간  </h2> 
+
+  <h2> ⌛ 개발 기간  </h2> 
   2022/05/02  ~ 2022/05/06 
-  <h2> 💻 어떻게 일했나?  </h2>  
+
+  
+# 💻 Project
+  ### 💭 프로젝트 설명 & 분석
+  - 주어진 데이터를 여러 필터링을 사용하여 레스토랑의 인사이트를 보여주는 API를 만든다
+
+  
+<details>
+  <summary>누가 사용 할 서비스인가?</summary>
+<div markdown="1">
+
+- 크게 세가지 권한 단위로 구분 할 수 있다
+
+  - 서비스 전체를 관리, 프랜차이즈들을 관리하고 정보를 조회 하는 **`API 서비스 관리자`** 
+      - 서비스 관리자는 고객은 아니지만 관리를 위해 서비스를 사용하게 될 것이다
+  - 해당 프랜차이즈의 음식점과 메뉴(menu)를 관리하고 정보를 조회하는 **`프랜차이즈 관리자`**
+      - 지점들의 정보를 분석해 프랜차이즈가 이윤을 추구 하는 전략, 방침을 제시할 수 있다
+  - 해당 음식점의 정보를 조회하는 **`음식점 점주`**  
+      - 해당 지점의 상권 특성을 분석해 같은 프랜차이즈 내에서도 차별화를 둘 수 있다
+
+</div>
+</details>
+
+<details>
+  <summary>어떤 관계로 이루어져 있는가?</summary>
+<div markdown="1">
+         
+ [참고: ERD](#erd) 
+
+  -  **`프랜차이즈(Subsidary)`** 는 **`id와 이름으로 구분`** 되며 **`음식 지점`** 들을 가지고있고 그 지점에서 판매하는 **`메뉴`** 를 가지고있다. 나중에는 지점별로 특성에 맞게 변형 될 수 있겠지만 메뉴의 기본 틀은 프랜차이즈를 따라간다  
+
+  - **`음식점(Restaurant)`** 의 **이름(Name)은 프랜차이즈와 주소(Ward) (예시: 버거킹, 서초구 신림동)로** 이루어져있으며 같은 주소에 같은 프랜차이즈가 있을 경우를 대비해 **`호점(Store)`** 이라는 숫자로 구분 할 수 있다
+  - **`메뉴(Menu)`** 는 **소속된 프랜차이즈 , 이름 과 가격** 으로 이루어져있다 
+  - 음식점에서 나오는 **`결과(Result)`** 는 **한 테이블의 주문 정보** 라고 볼 수 있다 **음식점 , 프랜차이즈 , 결제수단(Payment) , 인원수(number_of_party) , 총금액(total_payment)** 로 이루어져있다.
+  - 결과만 봐서는 총 금액은 알 수 있지만 어떤 메뉴를 주문했는지 알 수 가 없어 **결과와 메뉴를 Many to many** 로 연결해주는 **`메뉴결과(ResultMenu)` 는 주문** 이라고 볼 수 있다.   
+ - **`메뉴결과(ResultMenu)`** 는 **어떤 메뉴인지 , 어느 테이블(결과) 인지 양(quantity)** 은 얼마나 되는지 표시 할 수 있다.  
+ **`할인(discount_rate)` 을 주문에서** 적용 할 수 있게 해 같은 메뉴 몇개 이상시 할인 혹은 직원 할인, 프랜차이즈 프로모션 , 지점에 맞춘 특별 할인등에 유연하게 적용 할 수있다.
+
+</div>
+</details>
+
+<details>
+  <summary>어떤 정보를 조회(집계) 할 수 있는가?</summary>
+<div markdown="1">
+
+- 먼저 필수로 `기간` 과 `시간단위(time_window)` 이 필요하다 그리고 크게 세가지를 기준으로 집계를 할 수 있다.
+  - `금액 범위`
+  - `결제 수단`
+  - `인원 수 `
+ 
+</div>
+</details>
+
    
-  💻 [Team page](https://mature-citron-a04.notion.site/Wanted_Pre_Onboarding-6af013e2bb3b43739cebc641de4ff558)    
-  📒 [Project page](https://mature-citron-a04.notion.site/2-b8c6440fee49445ca63ce4d73d8b19e7)
+  ### 🚥 개발 조건 
   
-## 💻 Project
-  ### 💻 프로젝트 설명 
-  주어진 데이터를 여러 필터링을 사용하여 레스토랑의 인사이트를 보여주는 API를 만든다
-  ### 💻 개발 조건 
-  
-  #### 필수사항  
+  #### 🙆‍♂️ 필수사항  
     - RDB 사용 - MySQL  
     - Django  
     - REST API V1 구현  
         - POS의 결제 정보를 RDB로 보냅니다  
         - 레스토랑 KPI를 집계  
-  #### 선택사항
+  #### 🔥 선택사항
     - REST API V2 구현  
     - Unit test codes  
     - REST API Documentation (Swagger UI)  
 
-### 요구 조건
+### 💫 요구 조건
 
 <details>
   <summary>REST API V1</summary>
@@ -64,7 +130,7 @@
         | 주문결과 (주문 내역) | ResultMenu |
         | 업종 정보 | Subsidary |  
   
-        - POS의 결제 정보를 RDB로 보냅니다
+        -  POS의 결제 정보를 RDB로 보냅니다
             - 어떤 method를 사용할 것인가?
             - 업로드 해야하는 데이터
                 
@@ -76,17 +142,17 @@
                 
                 → timestamp
                 
-    - `조회`
+    -  조회
         - 레스토랑별 KPI
             
             관리자는 다양한 필터를 이용해 집계를 확인할 수 있습니다.
             
-            - 집계 기능
+            -  집계 기능
                 - 시간단위
                     
                     → e.g. HOUR, DAY, WEEK, MONTH, YEAR
                     
-            - 필터 기능
+            -  필터 기능
                 - input
                     - 기간 별 (must)
                         
@@ -194,11 +260,23 @@
   </div>
 </details>
   
-  ## 모델링
+  ## ERD
   
-  ![image](https://user-images.githubusercontent.com/86823305/167058689-7a9ccdca-dd6f-462b-b4e3-0e569dce7b27.png)
+  ![image](https://user-images.githubusercontent.com/86823305/167058689-7a9ccdca-dd6f-462b-b4e3-0e569dce7b27.png)  
+  
   
   ## 구현 기능
+
+  - [x] 업종 (Subsidary) CRUD 기능
+  - [x] 레스토랑 (Restaurant) CRUD 기능
+  - [x] 메뉴 (Menu) CRUD 기능
+  - [x] 주문 (Result) Create 기능
+  - [x] 조건 별 KPI R(조회)
+  - [x] Test cases code - Restaurant , Menu
+  - [ ] API 명세서
+  - [ ] 메뉴 할인 
+  - [ ] 메뉴 토핑
+  - [ ] 관리자 기능
   
   ## API 명세서
   
@@ -207,11 +285,7 @@
   ## 사용된 기술 스택
   
   > - Back-End :  <img src="https://img.shields.io/badge/Python 3.10-3776AB?style=flat&logo=Python&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Django 4.0.4-092E20?style=flat&logo=Django&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/mysql 5.0-1b9e41?style=flat&logo=Mysql&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Django_rest_freamwork 3.13.1-009287?style=flat&logo=Django-rest-freamwork&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Pytest 7.1.2-0A9EDC?style=flat&logo=Pytest&logoColor=white"/>
-> - ETC :  <img src="https://img.shields.io/badge/Git-F05032?style=flat-badge&logo=Git&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Github-181717?style=flat-badge&logo=Github&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Swagger-FF6C37?style=flat-badge&logo=Swagger&logoColor=white"/>
-  
- 
-
-  
+> - ETC　　　:  <img src="https://img.shields.io/badge/Git-F05032?style=flat-badge&logo=Git&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Github-181717?style=flat-badge&logo=Github&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Swagger-FF6C37?style=flat-badge&logo=Swagger&logoColor=white"/>
   
   
   ## 
