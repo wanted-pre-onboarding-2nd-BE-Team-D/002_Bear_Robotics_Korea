@@ -37,3 +37,17 @@ class Test_Subsidary:
             f'/restaurants/subsidary/{_setup.id}'
         )
         assert response.data['is_delete'] == False
+        assert response.status_code == 200
+
+    
+    def test_subsidary_soft_delete(self, client, _setup):
+        # Soft-delete실행하면 is_delete = True로 변경되는지
+        temp = {
+            "is_delete": True
+        }
+        
+        response = client.put(
+            f'/restaurants/subsidary/{_setup.id}',
+            json.dumps(temp), content_type = "application/json"
+        )
+        assert response.data['is_delete'] == True

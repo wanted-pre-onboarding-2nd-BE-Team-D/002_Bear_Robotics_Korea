@@ -52,7 +52,7 @@ class SubsidaryDetail(APIView):
 
     def put(self, request, id, format=None):
         subsidary = self.get_object(id)
-        serializer = SubsidarySerializer(subsidary, data=request.data)
+        serializer = SubsidarySerializer(subsidary, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
