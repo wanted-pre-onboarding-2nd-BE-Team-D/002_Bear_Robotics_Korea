@@ -1,21 +1,17 @@
 from rest_framework import serializers
 
-from results.models import Result,ResultMenu,Payment
+from results.models import Result, ResultMenu
+
 
 class ResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = Result
-        fields = "__all__"
+        fields = ['id', 'created_at', 'updated_at', 'delete_at', 'restaurant',
+                  'subsidary', 'menus', 'payment', 'numbers_of_party', 'total_price']
 
 
 class ResultMenuSerializer(serializers.ModelSerializer):
     class Meta:
         model = ResultMenu
-        fields = "__all__"
-
-
-class PaymentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Payment
-        fields = "__all__"
-
+        fields = ['id', 'created_at', 'updated_at', 'delete_at',
+                  'result', 'menu', 'quantity', 'discount_rate']
