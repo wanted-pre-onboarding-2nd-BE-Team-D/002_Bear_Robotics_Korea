@@ -12,7 +12,7 @@ class RestaurantSerializer(serializers.ModelSerializer):
 class SubsidarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Subsidary
-        fields = ['id', 'created_at', 'updated_at', 'name']
+        fields = ['id', 'created_at', 'updated_at', 'name', 'is_delete']
 
 
 class MenuSerializer(serializers.ModelSerializer):
