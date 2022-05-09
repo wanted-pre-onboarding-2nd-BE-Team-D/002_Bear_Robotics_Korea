@@ -273,14 +273,18 @@
   - [x] 주문 (Result) Create 기능
   - [x] 조건 별 KPI R(조회)
   - [x] Test cases code - Restaurant , Menu
-  - [ ] API 명세서
+  - [x] API 명세서
   - [ ] 메뉴 할인 
   - [ ] 메뉴 토핑
   - [ ] 관리자 기능
   
   ## API 명세서
-  
+  [API 명세서 (Swagger)](https://app.swaggerhub.com/apis/nxxxtyetdecided8/Bear_Robotics_D/1.0.0#)
   ## 테스트 케이스
+  
+  ![image](https://user-images.githubusercontent.com/86823305/167321623-2acd83e1-a08f-4b2b-946c-104a3d20b424.png)
+  
+  Pytest-Django로 구현 된 24개의 테스트 구현, 통과 완료
   
   ## 사용된 기술 스택
   
@@ -291,8 +295,4 @@
   ## 
 
 
-<div align="center"> 
-  
-  ![image](http://image.pullbbang.com/pull2012/upload/board/2018/2/20180217010016472.gif)
-<h3>End</h3>
-  </div> 
+

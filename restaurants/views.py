@@ -1,12 +1,13 @@
-from urllib import response
-from django.http import Http404
-from datetime import datetime, timedelta
-from django.utils import timezone
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from datetime                import datetime
+from django.utils            import timezone
+from django.http             import Http404
+from drf_yasg.utils          import swagger_auto_schema
 
-from .models import Restaurant, Subsidary, Menu, Ward, Neighborhood
+from rest_framework          import status
+from rest_framework.response import Response
+from rest_framework.views    import APIView
+
+from .models      import Restaurant, Subsidary, Menu, Ward
 from .serializers import SubsidarySerializer, RestaurantSerializer, MenuSerializer
 
 
@@ -18,6 +19,8 @@ class SubsidaryList(APIView):
         류성훈
     """
 
+    @swagger_auto_schema(tags=['get all subsidary.'],
+                         responses={200: 'Success'})
     def get(self, request, format=None):
         # Subsidary의 모든 유효한 데이터를 읽어온다.
         subsidary = Subsidary.objects.filter(is_delete=False)
@@ -45,11 +48,15 @@ class SubsidaryDetail(APIView):
         except Subsidary.DoesNotExist:
             raise Http404
 
+    @swagger_auto_schema(tags=['get the details of the subsidary'], \
+                         responses={200: 'Success'})
     def get(self, request, id, format=None):
         subsidary = self.get_object(id)
         serializer = SubsidarySerializer(subsidary)
         return Response(serializer.data)
 
+    @swagger_auto_schema(tags=['update the details of the subsidary'], request_body=SubsidarySerializer, \
+                         responses={200: 'Success', 400: 'Bad_Request'})
     def put(self, request, id, format=None):
         subsidary = self.get_object(id)
         serializer = SubsidarySerializer(subsidary, data=request.data, partial=True)
@@ -65,6 +72,8 @@ class SubsidaryDetail(APIView):
     #     return Response(status=status.HTTP_204_NO_CONTENT)
 
     # 한번 삭제 시 Soft Delete / Soft Delete 된 데이터 또 삭제 시 영구 Delete
+    @swagger_auto_schema(tags=['delete a subsidary.'], \
+                         responses={200: 'Success', 400: 'Bad_Request', 404: 'Not_Found'})
     def delete(self, request, id, format=None):
         try:
             subsidary = Subsidary.objects.get(id=id)
@@ -100,6 +109,7 @@ class RestaurantListCR(APIView):
 
         return values
 
+    @swagger_auto_schema(tags=['get all restaurants.'], responses={200: 'Success'})
     def get(self, request):
         """
         GET: restaurant
@@ -115,6 +125,8 @@ class RestaurantListCR(APIView):
         serializers = RestaurantSerializer(obj, many=True)
         return Response(serializers.data)
 
+    @swagger_auto_schema(tags=['create a restaurant'], request_body=RestaurantSerializer, \
+                         responses={201: 'Success', 400: 'Bad_Request'})
     def post(self, request):
         """
         POST: resurant
@@ -167,6 +179,8 @@ class RestaurantListUD(APIView):
         values['subsidary_obj'] = Subsidary.objects.get(name=values['subsidary'])
         return values
 
+    @swagger_auto_schema(tags=['get the details of the restaurant.'], \
+                         responses={200: 'Success', 404: 'Bad_Request'})
     def get(self, request, id=None):
         """
         GET: restaurant/<id>
@@ -179,6 +193,8 @@ class RestaurantListUD(APIView):
         serializers = RestaurantSerializer(obj, many=False)
         return Response(serializers.data)
 
+    @swagger_auto_schema(tags=['update the details of the restaurant.'], request_body=RestaurantSerializer, \
+                         responses={200: 'Success', 400: 'Bad_Request', 404: 'Not_Found'})
     def put(self, request, id=None):
         """
         PUT: restaurant/<id>
@@ -226,6 +242,8 @@ class RestaurantListUD(APIView):
 
         return Response(serializers.data)
 
+    @swagger_auto_schema(tags=['delete a restaurant.'], \
+                         responses={200: 'Success', 400: 'Bad_Request', 404: 'Not_Found'})
     def delete(self, request, id=None):
         if id:
             obj = Restaurant.objects.get(id=id)
@@ -235,101 +253,7 @@ class RestaurantListUD(APIView):
                 Response({'MESSAGE': 'DOES_NOT_EXIST'}, status=404)
             else:
                 obj.is_delete = True
-                obj.delete_at = timezone.localtime()
-            obj.save()
-        else:
-            # ID입력을 안하면 에러
-            Response({'MESSAGE': 'MISSING_VALUE'}, status=400)
-
-        serializers = RestaurantSerializer(obj)
-        return Response(serializers.data)
-
-
-class RestaurantListUD(APIView):
-    """
-    Restaurant List UD API
-
-    김석재
-    """
-
-    def _change_to_id(self, request):
-        # 주소, 업종을 id로 변환
-        values = {}
-        values['ward'] = request.data['ward']
-        values['subsidary'] = request.data['subsidary']
-        values['ward_obj'] = Ward.objects.get(name=values['ward'])
-        values['subsidary_obj'] = Subsidary.objects.get(name=values['subsidary'])
-        return values
-
-    def get(self, request, id=None):
-        """
-        GET: restaurant/<id>
-        디테일 조회
-        """
-        try:
-            obj = Restaurant.objects.get(is_delete=False, id=id)
-        except:
-            return Response({'MESSAGE': 'DOES_NOT_EXIST'}, status=404)
-        serializers = RestaurantSerializer(obj, many=False)
-        return Response(serializers.data)
-
-    def put(self, request, id=None):
-        """
-        PUT: restaurant/<id>
-        data:{
-                "subsidary" : "맥도날드",
-                "ward"      : "서초구 서초동",
-                "store"     : 1
-            }
-        값을 입력받아 수정
-        """
-
-        if id:
-            if len(request.data.values()) == 0 or "" in request.data.values():
-                return Response({'MESSAGE': 'MISSING_VALUE'}, status=400)
-
-            obj = Restaurant.objects.get(id=id)
-
-            # 삭제된 값이라면 에러
-            if obj.is_delete == True:
-                Response({'MESSAGE': 'DOES_NOT_EXIST'}, status=404)
-
-            # 입력된 값을 변경
-            if 'ward' in request.data:
-                ward_obj = Ward.objects.get(name=request.data['ward'])
-                obj.ward_id = ward_obj.id
-            if 'subsidary' in request.data:
-                subsidary_obj = Subsidary.objects.get(name=request.data['subsidary'])
-                obj.subsidary_id = subsidary_obj.id
-            if 'store' in request.data:
-                obj.store = request.data['store']
-
-            # 주소와 업종 동시에 똑같은 값이 있을 경우
-            try:
-                if Restaurant.objects.get(ward_id=obj.ward_id, subsidary_id=obj.subsidary_id,
-                                          store=obj.store, is_delete=False):
-                    return Response({'MESSAGE': 'DUPLICATE_VALUE'}, status=400)
-            except:
-                ward = Ward.objects.get(id=obj.ward_id).name
-                subsidary = Subsidary.objects.get(id=obj.subsidary_id).name
-                obj.name = f"{subsidary}, {ward}점"
-                obj.save()
-        else:
-            Response({'MESSAGE': 'MISSING_VALUE'}, status=400)
-        serializers = RestaurantSerializer(obj)
-
-        return Response(serializers.data)
-
-    def delete(self, request, id=None):
-        if id:
-            obj = Restaurant.objects.get(id=id)
-
-            # 이미 삭제 되었다면 에러
-            if obj.is_delete == True:
-                Response({'MESSAGE': 'DOES_NOT_EXIST'}, status=404)
-            else:
-                obj.is_delete = True
-                obj.delete_at = timezone.localtime()
+                obj.delete_at = datetime.now()
             obj.save()
         else:
             # ID입력을 안하면 에러
@@ -350,22 +274,26 @@ class MenuCreateListView(APIView):
          }
     """
 
+    @swagger_auto_schema(tags=['get all menus.'], responses={200: 'Success'})
     def get(self, request):
         menus = Menu.objects.filter(is_delete=False)
         serializer = MenuSerializer(menus, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(tags=['create a menu.'], request_body=MenuSerializer, \
+                         responses={201: 'Success', 400: 'Bad_Request'})
     def post(self, request):
         subsidary = request.data['subsidary']
         name = request.data['name']
-        if Menu.objects.get(subsidary_id=subsidary, name=name, is_delete=False):
-            return Response({'MESSAGE': 'DUPLICATE_VALUE'}, status=400)
-
-        serializer = MenuSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            if Menu.objects.get(subsidary_id=subsidary, name=name, is_delete=False):
+                return Response({'MESSAGE': 'DUPLICATE_VALUE'}, status=400)
+        except:
+            serializer = MenuSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MenuDetailView(APIView):
@@ -379,6 +307,8 @@ class MenuDetailView(APIView):
         except Menu.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+    @swagger_auto_schema(tags=['get the details of the menu.'], \
+                         responses={200: 'Success', 404: 'Not_Found'})
     def get(self, request, id):
         menu = self.get_object(id)
         if menu == 404:
@@ -387,6 +317,8 @@ class MenuDetailView(APIView):
         serializer = MenuSerializer(menu)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(tags=['update the details of the menu.'], request_body=MenuSerializer, \
+                         responses={200: 'Success', 400: 'Bad_Request', 404: 'Not_Found'})
     def patch(self, request, id):
         menu = self.get_object(id)
         if menu == 404:
@@ -398,6 +330,8 @@ class MenuDetailView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(tags=['delete a menu.'], \
+                         responses={200: 'Success', 404: 'Not_Found'})
     def delete(self, request, id):
         menu = self.get_object(id)
 
