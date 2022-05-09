@@ -282,6 +282,10 @@
   
   ## 테스트 케이스
   
+  ![image](https://user-images.githubusercontent.com/86823305/167321623-2acd83e1-a08f-4b2b-946c-104a3d20b424.png)
+  
+  Pytest-Django로 구현 된 24개의 테스트 구현, 통과 완료
+  
   ## 사용된 기술 스택
   
   > - Back-End :  <img src="https://img.shields.io/badge/Python 3.10-3776AB?style=flat&logo=Python&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Django 4.0.4-092E20?style=flat&logo=Django&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/mysql 5.0-1b9e41?style=flat&logo=Mysql&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Django_rest_freamwork 3.13.1-009287?style=flat&logo=Django-rest-freamwork&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Pytest 7.1.2-0A9EDC?style=flat&logo=Pytest&logoColor=white"/>
