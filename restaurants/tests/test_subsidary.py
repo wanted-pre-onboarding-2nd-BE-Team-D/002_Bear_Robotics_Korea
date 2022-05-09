@@ -51,3 +51,6 @@ class Test_Subsidary:
             json.dumps(temp), content_type = "application/json"
         )
         assert response.data['is_delete'] == True
+        assert response.status_code == 200
+
+    
