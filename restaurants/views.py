@@ -329,7 +329,7 @@ class RestaurantListUD(APIView):
                 Response({'MESSAGE': 'DOES_NOT_EXIST'}, status=404)
             else:
                 obj.is_delete = True
-                obj.delete_at = timezone.localtime()
+                obj.delete_at = datetime.now()
             obj.save()
         else:
             # ID입력을 안하면 에러
