@@ -46,7 +46,7 @@
   </div> 
 
   <h2> ⌛ 개발 기간  </h2> 
-  2022/05/02  ~ 2022/05/06 
+  2022/05/02  ~ 2022/05/09 
 
   
 # 💻 Project
@@ -272,8 +272,8 @@
   - [x] 메뉴 (Menu) CRUD 기능
   - [x] 주문 (Result) Create 기능
   - [x] 조건 별 KPI R(조회)
-  - [x] Test cases code - Restaurant , Menu
-  - [x] API 명세서
+  - [x] Test cases code - Restaurant, Menu, Subsidary
+  - [x] API 명세서 - SWAGGER
   - [ ] 메뉴 할인 
   - [ ] 메뉴 토핑
   - [ ] 관리자 기능
