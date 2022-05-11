@@ -14,6 +14,7 @@ from pathlib     import Path
 from my_settings import DATABASES, SECRET_KEY
 
 import pymysql
+import os
 
 pymysql.install_as_MySQLdb()
 
@@ -132,7 +133,12 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = '/GIt작업/002_Bear_Robotics_Korea/static'
 
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 

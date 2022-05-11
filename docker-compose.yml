@@ -1,0 +1,48 @@
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - .:/code
+      - ./config/nginx:/etc/nginx.conf.d
+      - ./static:/static
+    depends_on:
+      - web 
+  db:
+    image: mysql:8.0.28    
+    # build: 
+    #   context: ./database/
+    #   dockerfile: Dockerfile
+    container_name: db
+    ports:
+      - 3307:3306
+    env_file:
+      - env
+#    environment:
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      #- data:/var/lib/mysql/
+      - ./002_bear_robotics.sql:/docker-entrypoint-initdb.d/002_bear_robotics.sql
+    restart: always
+
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      bash -c "python /code/manage.py migrate
+      && gunicorn config.wsgi --bind 0.0.0.0:8000"
+   #   && python /code/manage.py runserver 0.0.0.0:8000"      
+    volumes:
+      - .:/code
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    restart: always
+    # expose:
+    #   - "8000"
+
