@@ -1,41 +1,51 @@
 services:
+  #nginx
   nginx:
+    #docker hub에서 가져올 이미지   이미지 이름 : 버전
     image: nginx:latest
+    # 로컬포트 : 도커포트를 연결
     ports:
       - 80:80
+    # 로컬상의 파일 : 도커의 파일을 연동
     volumes:
       - .:/code
-      - ./config/nginx:/etc/nginx.conf.d
-      - ./static:/static
+      - ./config/nginx:/etc/nginx/conf.d
+      #구니콘으로 실행하면 django의 css같은 파일을 불러오지못해 직접 준다
+      - ./static/:/static
+    # 명시된 도커가 실행되었을떄만 실행 ( 순서에 영향을 준다)
     depends_on:
       - web 
   db:
-    image: mysql:8.0.28    
-    # build: 
-    #   context: ./database/
-    #   dockerfile: Dockerfile
+    image: mysql:8.0.28       
     container_name: db
+    #로컬에서 이미 mysql이 3306포트를 사용하고있어 3307로 빼줬다
     ports:
       - 3307:3306
     env_file:
+    #db 환경파일
       - env
-#    environment:
     command:
+      #db 서버의 기본 문제셋을 utf8mb4로 변경
       - --character-set-server=utf8mb4
+      #db 서버의 문자열 정렬 규칙 변경
       - --collation-server=utf8mb4_unicode_ci
     volumes:
-      #- data:/var/lib/mysql/
+    #docker-entrypoint-initdb.d에 있는 sql 파일로 기본 db를 셋팅  
       - ./002_bear_robotics.sql:/docker-entrypoint-initdb.d/002_bear_robotics.sql
+      #꺼져도 다시 켜짐
     restart: always
 
   web:
+    #image를 받아 오는게 아닌 만들어둔 dockfile에서 build
     build: 
+      #위치를 표시
       context: .
       dockerfile: Dockerfile
+    #migrate를 하고 구니콘으로 실행
     command: >
-      bash -c "python /code/manage.py migrate
-      && gunicorn config.wsgi --bind 0.0.0.0:8000"
-   #   && python /code/manage.py runserver 0.0.0.0:8000"      
+      bash -c "gunicorn config.wsgi --bind 0.0.0.0:8000"
+    # python /code/manage.py migrate
+    # 로컬 : 도커 연동
     volumes:
       - .:/code
     ports:
@@ -45,4 +55,3 @@ services:
     restart: always
     # expose:
     #   - "8000"
-
