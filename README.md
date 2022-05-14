@@ -20,6 +20,7 @@
 - [프로젝트 요구 조건](#-요구-조건)  
 - [ERD](#erd)  
 - [구현 기능](#구현-기능)  
+- [배포](#-배포)
 - [API 명세서](#api-명세서)  
 - [Test cases code](#테스트-케이스)  
 - [기술 스택](#사용된-기술-스택)  
@@ -278,6 +279,12 @@
   - [ ] 메뉴 토핑
   - [ ] 관리자 기능
   
+  ## 🔥 배포
+
+  docker를 이용해 프로젝트 api를 컨테이너화 하여 EC2에 배포했습니다
+
+  [API Link](http://54.180.147.196/restaurants/)
+  
   ## API 명세서
   [API 명세서 (Swagger)](https://app.swaggerhub.com/apis/nxxxtyetdecided8/Bear_Robotics_D/1.0.0#)
   ## 테스트 케이스
@@ -288,8 +295,9 @@
   
   ## 사용된 기술 스택
   
-  > - Back-End :  <img src="https://img.shields.io/badge/Python 3.10-3776AB?style=flat&logo=Python&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Django 4.0.4-092E20?style=flat&logo=Django&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/mysql 5.0-1b9e41?style=flat&logo=Mysql&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Django_rest_freamwork 3.13.1-009287?style=flat&logo=Django-rest-freamwork&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Pytest 7.1.2-0A9EDC?style=flat&logo=Pytest&logoColor=white"/>
-> - ETC　　　:  <img src="https://img.shields.io/badge/Git-F05032?style=flat-badge&logo=Git&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Github-181717?style=flat-badge&logo=Github&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Swagger-FF6C37?style=flat-badge&logo=Swagger&logoColor=white"/>
+> - Back-End :  <img src="https://img.shields.io/badge/Python 3.10-3776AB?style=flat&logo=Python&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Django 4.0.4-092E20?style=flat&logo=Django&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Django-DRF 3.13.1-009287?style=flat&logo=Django&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Mysql 8.0.28 -1b9e41?style=flat&logo=Mysql&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Docker 20.10.14-2496ED?style=flat&logo=docker&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Gunicorn 20.1.0-499848?style=flat&logo=gunicorn&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/NGINX 1.21.6-0ECAD4?style=flat&logo=NGINX&logoColor=white"/>
+> 
+> - ETC　　　:  <img src="https://img.shields.io/badge/Git-F05032?style=flat-badge&logo=Git&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Github-181717?style=flat-badge&logo=Github&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Swagger-FF6C37?style=flat-badge&logo=Swagger&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/AWS EC2-FF9900?style=flat-badge&logo=Amazon AWS&logoColor=white"/>
   
   
   ## 
