@@ -286,7 +286,7 @@
   [API Link](http://54.180.147.196/restaurants/)
   
   ## API 명세서
-  [API 명세서 (Swagger)](https://app.swaggerhub.com/apis/nxxxtyetdecided8/Bear_Robotics_D/1.0.0#)
+  [API 명세서 (Swagger)](https://app.swaggerhub.com/apis/nxxxtyetdecided8/Bear_Robotics_D/1.0.0#](https://app.swaggerhub.com/apis-docs/nxxxtyetdecided8/Bear_Robotics_D/1.0.0)
   ## 테스트 케이스
   
   ![image](https://user-images.githubusercontent.com/86823305/167321623-2acd83e1-a08f-4b2b-946c-104a3d20b424.png)
