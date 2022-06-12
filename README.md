@@ -283,8 +283,8 @@
 
   docker를 이용해 프로젝트 api를 컨테이너화 하여 EC2에 배포했습니다
 
-  [API Link](http://54.180.147.196/restaurants/)
-  
+  [API Link](http://3.85.86.218/restaurants/)
+
   ## API 명세서
   
   [API 명세서 (Swagger)](https://app.swaggerhub.com/apis-docs/nxxxtyetdecided8/Bear_Robotics_D/1.0.0/)
